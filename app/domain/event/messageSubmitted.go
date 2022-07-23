@@ -2,7 +2,7 @@ package event
 
 import "time"
 
-const name = "MessageSubmitted"
+const messageSubmitted = "MessageSubmitted"
 
 type MessageSubmitted struct {
 	name     string
@@ -13,7 +13,7 @@ type MessageSubmitted struct {
 
 func NewMessageSubmitted(userName string, message string, time time.Time) *MessageSubmitted {
 	return &MessageSubmitted{
-		name:     name,
+		name:     messageSubmitted,
 		UserName: userName,
 		Message:  message,
 		Time:     time,

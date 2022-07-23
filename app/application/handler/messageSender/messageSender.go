@@ -29,6 +29,9 @@ func (m *MessageSender) Name() string {
 
 func (m *MessageSender) Handle(e event.DomainEvent) {
 	submittedMessageEvent := e.(*event.MessageSubmitted)
+	//TODO handle err
 	submittedMessage, _ := entity.NewChatMessage(submittedMessageEvent.UserName, submittedMessageEvent.Message, submittedMessageEvent.Time)
 	m.repo.Save(submittedMessage)
+	sentMessage := event.NewMessageSent(submittedMessage.UserName, submittedMessage.Text, submittedMessage.Time)
+	m.mediator.Publish(sentMessage)
 }

@@ -29,8 +29,23 @@ func (m *MessageSender) Name() string {
 
 func (m *MessageSender) Handle(e event.DomainEvent) {
 	submittedMessageEvent := e.(*event.MessageSubmitted)
+	if entity.IsABotCommand(submittedMessageEvent.Message) {
+		m.HandleBotCommand(submittedMessageEvent)
+	} else {
+		m.HandleMessage(submittedMessageEvent)
+	}
+}
+
+func (m *MessageSender) HandleBotCommand(e *event.MessageSubmitted) {
 	//TODO handle err
-	submittedMessage, _ := entity.NewChatMessage(submittedMessageEvent.UserName, submittedMessageEvent.Message, submittedMessageEvent.Time)
+	submittedBotMessage, _ := entity.NewBotMessage(e.Message)
+	sentBotMessage := event.NewBotMessageSent(submittedBotMessage)
+	m.mediator.Publish(sentBotMessage)
+}
+
+func (m *MessageSender) HandleMessage(e *event.MessageSubmitted) {
+	//TODO handle err
+	submittedMessage, _ := entity.NewChatMessage(e.UserName, e.Message, e.Time)
 	m.repo.Save(submittedMessage)
 	sentMessage := event.NewMessageSent(submittedMessage.UserName, submittedMessage.Text, submittedMessage.Time)
 	m.mediator.Publish(sentMessage)

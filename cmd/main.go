@@ -1,8 +1,10 @@
 package main
 
 import (
+	botmessagehandler "github.com/camopy/browser-chat/app/application/handler/botMessageHandler"
 	messagereceiver "github.com/camopy/browser-chat/app/application/handler/messageReceiver"
 	messagesender "github.com/camopy/browser-chat/app/application/handler/messageSender"
+	"github.com/camopy/browser-chat/app/infra/bot"
 	"github.com/camopy/browser-chat/app/infra/broadcaster"
 	"github.com/camopy/browser-chat/app/infra/mediator"
 	"github.com/camopy/browser-chat/app/infra/repository"
@@ -13,13 +15,16 @@ func main() {
 	db := repository.NewChatMessageMemoryRepository()
 	mediator := mediator.New()
 	broadcaster := broadcaster.New()
-	registerEventHandlers(mediator, db, broadcaster)
+	bot := bot.New()
+	registerEventHandlers(mediator, db, broadcaster, bot)
 	startWebsocket(db, mediator, broadcaster)
 }
 
-func registerEventHandlers(mediator *mediator.Mediator, repo *repository.ChatMessageRepository, broadcaster *broadcaster.Broadcaster) {
+func registerEventHandlers(mediator *mediator.Mediator, repo *repository.ChatMessageRepository, broadcaster *broadcaster.Broadcaster, bot *bot.Bot) {
 	senderHandler := messagesender.New(mediator, repo)
 	mediator.Register(senderHandler)
+	botMessageHandler := botmessagehandler.New(mediator, bot)
+	mediator.Register(botMessageHandler)
 	receiverHandler := messagereceiver.New(mediator, broadcaster)
 	mediator.Register(receiverHandler)
 }

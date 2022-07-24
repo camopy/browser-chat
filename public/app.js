@@ -7,7 +7,8 @@ window.addEventListener("DOMContentLoaded", (_) => {
     // creating html element
     let p = document.createElement("p");
     console.log(data);
-    p.innerHTML = `<strong>${data.userName}</strong>: ${data.text}`;
+    let date = new Date(data.time);
+    p.innerHTML = `<strong>${date.toLocaleString()} - ${data.userName}</strong>: ${data.text}`;
 
     room.append(p);
     room.scrollTop = room.scrollHeight; // Auto scroll to the bottom

@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
@@ -114,9 +115,13 @@ func (websocket *Websocket) HandleMessages(broadcaster service.Broadcaster) {
 
 func (websocket *Websocket) sendMessageToClient(client *websocket.Conn, msg *entity.ChatMessage) {
 	err := client.WriteJSON(msg)
-	if err != nil {
+	if err != nil && unsafeError(err) {
 		log.Printf("error: %v", err)
 		client.Close()
 		websocket.removeClient(client)
 	}
+}
+
+func unsafeError(err error) bool {
+	return !websocket.IsCloseError(err, websocket.CloseGoingAway) && err != io.EOF
 }

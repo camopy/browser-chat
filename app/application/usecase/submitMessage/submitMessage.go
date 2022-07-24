@@ -12,9 +12,9 @@ type SubmitMessage struct {
 }
 
 type Input struct {
-	UserName string
-	Message  string
-	Time     time.Time
+	UserName string    `json:"user_name" form:"required"`
+	Message  string    `json:"message" form:"required"`
+	Time     time.Time `json:"time"`
 }
 
 func New(m mediator.Mediator) *SubmitMessage {

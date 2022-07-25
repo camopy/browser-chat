@@ -46,7 +46,7 @@ func (m *MessageSender) HandleBotCommand(e *event.MessageSubmitted) {
 func (m *MessageSender) HandleMessage(e *event.MessageSubmitted) {
 	//TODO handle err
 	submittedMessage, _ := entity.NewChatMessage(e.UserName, e.Message, e.Time)
-	m.repo.Save(submittedMessage)
+	m.repo.CreateMessage(submittedMessage)
 	sentMessage := event.NewMessageSent(submittedMessage.UserName, submittedMessage.Text, submittedMessage.Time)
 	m.mediator.Publish(sentMessage)
 }

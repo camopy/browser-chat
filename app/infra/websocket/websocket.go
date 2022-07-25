@@ -12,10 +12,12 @@ import (
 	submitmessage "github.com/camopy/browser-chat/app/application/usecase/submitMessage"
 	"github.com/camopy/browser-chat/app/domain/entity"
 	"github.com/camopy/browser-chat/app/domain/repository"
+	"github.com/camopy/browser-chat/config"
 	"github.com/gorilla/websocket"
 )
 
 type Websocket struct {
+	conf        *config.Conf
 	db          repository.ChatMessageRepository
 	mediator    service.Mediator
 	broadcaster service.Broadcaster
@@ -24,7 +26,7 @@ type Websocket struct {
 	mu          sync.Mutex
 }
 
-func New(db repository.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster) *Websocket {
+func New(db repository.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster, conf *config.Conf) *Websocket {
 	clients := make(map[*websocket.Conn]bool)
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -33,6 +35,7 @@ func New(db repository.ChatMessageRepository, mediator service.Mediator, broadca
 	}
 
 	return &Websocket{
+		conf:        conf,
 		db:          db,
 		mediator:    mediator,
 		broadcaster: broadcaster,
@@ -54,20 +57,18 @@ func (websocket *Websocket) addClient(client *websocket.Conn) {
 }
 
 func (ws *Websocket) Start() error {
-	address := ":8085"
-
-	http.Handle("/", http.FileServer(http.Dir("./../public")))
+	http.Handle("/", http.FileServer(http.Dir("public")))
 	http.HandleFunc("/websocket", ws.HandleConnections)
 
 	srv := &http.Server{
-		Addr:         address,
+		Addr:         fmt.Sprintf(":%d", ws.conf.Server.Port),
 		Handler:      http.DefaultServeMux,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  15 * time.Second,
+		ReadTimeout:  ws.conf.Server.TimeoutRead,
+		WriteTimeout: ws.conf.Server.TimeoutWrite,
+		IdleTimeout:  ws.conf.Server.TimeoutIdle,
 	}
 
-	fmt.Printf("Starting websocket at %s\n", address)
+	fmt.Printf("Starting websocket at %s\n", srv.Addr)
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("failed to start websocket: %v", err)
 	}

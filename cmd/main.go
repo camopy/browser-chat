@@ -1,9 +1,12 @@
 package main
 
 import (
+	appbot "github.com/camopy/browser-chat/app/application/bot"
 	botmessagehandler "github.com/camopy/browser-chat/app/application/handler/botMessageHandler"
 	messagereceiver "github.com/camopy/browser-chat/app/application/handler/messageReceiver"
 	messagesender "github.com/camopy/browser-chat/app/application/handler/messageSender"
+	"github.com/camopy/browser-chat/app/application/service"
+	rep "github.com/camopy/browser-chat/app/domain/repository"
 	"github.com/camopy/browser-chat/app/infra/bot"
 	"github.com/camopy/browser-chat/app/infra/broadcaster"
 	"github.com/camopy/browser-chat/app/infra/mediator"
@@ -20,7 +23,7 @@ func main() {
 	startWebsocket(db, mediator, broadcaster)
 }
 
-func registerEventHandlers(mediator *mediator.Mediator, repo *repository.ChatMessageRepository, broadcaster *broadcaster.Broadcaster, bot *bot.Bot) {
+func registerEventHandlers(mediator service.Mediator, repo rep.ChatMessageRepository, broadcaster service.Broadcaster, bot appbot.Bot) {
 	senderHandler := messagesender.New(mediator, repo)
 	mediator.Register(senderHandler)
 	botMessageHandler := botmessagehandler.New(mediator, bot)
@@ -29,7 +32,7 @@ func registerEventHandlers(mediator *mediator.Mediator, repo *repository.ChatMes
 	mediator.Register(receiverHandler)
 }
 
-func startWebsocket(db *repository.ChatMessageRepository, mediator *mediator.Mediator, broadcaster *broadcaster.Broadcaster) {
+func startWebsocket(db rep.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster) {
 	websocket := websocket.New(db, mediator, broadcaster)
 	go websocket.HandleMessages(broadcaster)
 	websocket.Start()

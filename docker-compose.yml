@@ -12,6 +12,8 @@ services:
     depends_on:
       - db
     command: /bin/sh -c 'while ! nc -z db 5432; do sleep 1; done; ./docker/app/bin/init.sh;'
+    volumes:
+      - .:/browser-chat
     restart: always
 
   db:

@@ -7,6 +7,7 @@ import (
 	messagereceiver "github.com/camopy/browser-chat/app/application/handler/messageReceiver"
 	messagesender "github.com/camopy/browser-chat/app/application/handler/messageSender"
 	"github.com/camopy/browser-chat/app/application/service"
+	bcrypthash "github.com/camopy/browser-chat/app/application/service/passwordHash/bcryptHash"
 	dr "github.com/camopy/browser-chat/app/domain/repository"
 	"github.com/camopy/browser-chat/app/infra/bot"
 	"github.com/camopy/browser-chat/app/infra/broadcaster"
@@ -14,7 +15,9 @@ import (
 	"github.com/camopy/browser-chat/app/infra/mediator"
 	"github.com/camopy/browser-chat/app/infra/repository"
 	"github.com/camopy/browser-chat/app/infra/websocket"
+	"github.com/camopy/browser-chat/app/util/validator"
 	"github.com/camopy/browser-chat/config"
+	goval "github.com/go-playground/validator"
 )
 
 func main() {
@@ -37,7 +40,10 @@ func startChat(db *database.GORM, config config.ServerConf) {
 	broadcaster := broadcaster.New()
 	chatRepository := repository.NewChatMessageRepository(db)
 	registerEventHandlers(mediator, chatRepository, broadcaster)
-	startWebsocket(chatRepository, mediator, broadcaster, config)
+	hash := &bcrypthash.BcryptHash{}
+	userRepository := repository.NewUserRepository(hash, db)
+	validator := validator.New()
+	startWebsocket(chatRepository, userRepository, mediator, broadcaster, config, validator)
 }
 
 func registerEventHandlers(mediator service.Mediator, chatRepo dr.ChatMessageRepository, broadcaster service.Broadcaster) {
@@ -50,8 +56,8 @@ func registerEventHandlers(mediator service.Mediator, chatRepo dr.ChatMessageRep
 	mediator.Register(receiverHandler)
 }
 
-func startWebsocket(chatRepo dr.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster, conf config.ServerConf) {
-	websocket := websocket.New(chatRepo, mediator, broadcaster, conf)
+func startWebsocket(chatRepo dr.ChatMessageRepository, userRepo dr.UserRepository, mediator service.Mediator, broadcaster service.Broadcaster, conf config.ServerConf, validator *goval.Validate) {
+	websocket := websocket.New(chatRepo, userRepo, mediator, broadcaster, conf, validator)
 	go websocket.HandleMessages(broadcaster)
 	websocket.Start()
 }

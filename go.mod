@@ -4,10 +4,13 @@ go 1.18
 
 require (
 	github.com/stretchr/testify v1.8.0
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	gorm.io/gorm v1.22.4
 )
 
 require (
+	github.com/go-playground/locales v0.14.0 // indirect
+	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.12.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -18,13 +21,15 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-chi/chi v1.5.4
+	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gorilla/websocket v1.5.0
 	github.com/joeshaw/envdecode v0.0.0-20200121155833-099f1fc765bd
 	github.com/lib/pq v1.10.6

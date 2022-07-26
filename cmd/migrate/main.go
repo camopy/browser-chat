@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/camopy/browser-chat/app/infra/repository"
+	"github.com/camopy/browser-chat/app/infra/database"
 	"github.com/camopy/browser-chat/config"
 	"github.com/pressly/goose"
 )
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 	appConf := config.AppConfig()
-	appDb, err := repository.NewPostgreSQL(&appConf.Db)
+	appDb, err := database.NewPostgreSQL(&appConf.Db)
 	if err != nil {
 		log.Fatalf(err.Error())
 	}

@@ -2,17 +2,17 @@ package repository
 
 import "github.com/camopy/browser-chat/app/domain/entity"
 
-type ChatMessageRepository struct {
+type ChatMessageRepositoryMemory struct {
 	messages []*entity.ChatMessage
 }
 
-func NewChatMessageMemoryRepository() *ChatMessageRepository {
-	return &ChatMessageRepository{
+func NewChatMessageMemoryRepository() *ChatMessageRepositoryMemory {
+	return &ChatMessageRepositoryMemory{
 		messages: []*entity.ChatMessage{},
 	}
 }
 
-func (r *ChatMessageRepository) CreateMessage(chatMessage *entity.ChatMessage) error {
+func (r *ChatMessageRepositoryMemory) CreateMessage(chatMessage *entity.ChatMessage) error {
 	r.messages = append(r.messages, chatMessage)
 	return nil
 }

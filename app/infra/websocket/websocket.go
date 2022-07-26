@@ -17,7 +17,7 @@ import (
 )
 
 type Websocket struct {
-	conf        *config.Conf
+	conf        config.ServerConf
 	db          repository.ChatMessageRepository
 	mediator    service.Mediator
 	broadcaster service.Broadcaster
@@ -26,7 +26,7 @@ type Websocket struct {
 	mu          sync.Mutex
 }
 
-func New(db repository.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster, conf *config.Conf) *Websocket {
+func New(db repository.ChatMessageRepository, mediator service.Mediator, broadcaster service.Broadcaster, conf config.ServerConf) *Websocket {
 	clients := make(map[*websocket.Conn]bool)
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -61,11 +61,11 @@ func (ws *Websocket) Start() error {
 	http.HandleFunc("/websocket", ws.HandleConnections)
 
 	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", ws.conf.Server.Port),
+		Addr:         fmt.Sprintf(":%d", ws.conf.Port),
 		Handler:      http.DefaultServeMux,
-		ReadTimeout:  ws.conf.Server.TimeoutRead,
-		WriteTimeout: ws.conf.Server.TimeoutWrite,
-		IdleTimeout:  ws.conf.Server.TimeoutIdle,
+		ReadTimeout:  ws.conf.TimeoutRead,
+		WriteTimeout: ws.conf.TimeoutWrite,
+		IdleTimeout:  ws.conf.TimeoutIdle,
 	}
 
 	fmt.Printf("Starting websocket at %s\n", srv.Addr)

@@ -68,7 +68,7 @@ func (websocket *Websocket) addClient(client *websocket.Conn) {
 
 func (ws *Websocket) Start() error {
 	r := chi.NewRouter()
-	r.Handle("/", http.FileServer(http.Dir("public")))
+	r.Handle("/*", http.FileServer(http.Dir("public")))
 	r.HandleFunc("/websocket", ws.HandleConnections)
 	r.With(middleware.ContentTypeJson).Post("/signup", ws.HandleSignUp)
 
